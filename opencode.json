@@ -1,0 +1,98 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "opencode/claude-sonnet-4-5",
+  "small_model": "opencode/claude-haiku-4-5",
+  "autoupdate": "notify",
+  "share": "manual",
+  "instructions": ["AGENTS.md"],
+
+  "permission": {
+    "*": "ask",
+    "edit": "allow",
+    "bash": {
+      "*": "ask",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git add*": "allow",
+      "git branch*": "allow",
+      "npm test*": "allow",
+      "npm run *": "allow",
+      "pytest*": "allow",
+      "rm -rf*": "deny",
+      "sudo*": "deny"
+    },
+    "webfetch": "ask"
+  },
+
+  "agent": {
+    "plan": {
+      "description": "Read-only planning and architecture agent. Use this to scope out a change before implementing it — it cannot edit files or run bash.",
+      "mode": "primary",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+    "build": {
+      "description": "Default implementation agent: writes code, runs tests, fixes bugs.",
+      "mode": "primary",
+      "prompt": "{file:./prompt/build.md}"
+    },
+    "review": {
+      "description": "Reviews a diff, PR, or file for bugs, security issues and style problems. Never edits code.",
+      "mode": "subagent",
+      "model": "opencode/claude-sonnet-4-5",
+      "temperature": 0.1,
+      "prompt": "{file:./prompt/review.md}",
+      "permission": {
+        "edit": "deny",
+        "bash": "ask"
+      }
+    },
+    "docs": {
+      "description": "Writes and maintains documentation: READMEs, code comments, ADRs.",
+      "mode": "subagent",
+      "prompt": "{file:./prompt/docs.md}",
+      "permission": {
+        "bash": "deny"
+      }
+    }
+  },
+
+  "command": {
+    "test": {
+      "template": "Run the project's test suite. Report any failures with file:line references, then fix the ones that are safe and obvious to fix.",
+      "description": "Run tests and fix obvious failures",
+      "agent": "build"
+    },
+    "commit": {
+      "template": "Run `git diff --cached` (and `git diff` if nothing is staged) to see the pending changes, then write a concise, conventional-commits style commit message that explains *why*, and create the commit.",
+      "description": "Draft and create a commit from the current changes"
+    },
+    "pr-review": {
+      "template": "Review the diff between the current branch and $ARGUMENTS (default: main) for correctness, security and style issues. Do not make any edits — only report findings.",
+      "description": "Review the current branch's diff against a base branch",
+      "agent": "review"
+    },
+    "docs-update": {
+      "template": "Look at $ARGUMENTS (default: the current diff) and update any README, docstrings, or docs that are now out of date.",
+      "description": "Sync docs with recent code changes",
+      "agent": "docs"
+    }
+  },
+
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    }
+  },
+
+  "formatter": {
+    "prettier": {
+      "disabled": false
+    }
+  }
+}
