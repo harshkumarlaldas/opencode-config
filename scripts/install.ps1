@@ -17,7 +17,18 @@ $ConfigDir = Join-Path $env:USERPROFILE ".config\opencode"
 
 if (-not (Get-Command opencode -ErrorAction SilentlyContinue)) {
     Write-Host "opencode not found, installing..."
-    irm https://opencode.ai/install.ps1 | iex
+
+    if (Get-Command npm -ErrorAction SilentlyContinue) {
+        npm install -g opencode-ai
+    } elseif (Get-Command scoop -ErrorAction SilentlyContinue) {
+        scoop install opencode
+    } elseif (Get-Command choco -ErrorAction SilentlyContinue) {
+        choco install opencode -y
+    } else {
+        Write-Host "No supported package manager found (npm, scoop, or choco)."
+        Write-Host "Install Node.js (https://nodejs.org) and re-run this script, or grab a binary from https://opencode.ai/download"
+        exit 1
+    }
 } else {
     Write-Host "opencode is already installed."
     opencode --version
