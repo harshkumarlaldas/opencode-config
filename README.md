@@ -17,10 +17,14 @@ cd opencode-config
 .\scripts\install.ps1
 ```
 
-The script installs the `opencode` CLI if it's missing, then links
-`opencode.json` and `AGENTS.md` into opencode's global config directory
-(`~/.config/opencode`, or `%USERPROFILE%\.config\opencode` on Windows) so
-this config applies everywhere, in every project, for that user.
+The script installs the `opencode` CLI if it's missing, links `opencode.json`
+and `AGENTS.md` into opencode's global config directory (`~/.config/opencode`,
+or `%USERPROFILE%\.config\opencode` on Windows), and clones/updates
+[GeniusOrchestrator](https://github.com/harshkumarlaldas/GeniusOrchestrator)
+alongside this repo, copying its `skills/` into the global opencode skills
+directory — the same personal skill library available in Claude Code via the
+`genius-orchestrator` plugin. Re-run the script any time GeniusOrchestrator
+changes to refresh the copy.
 
 Finally, connect a model provider:
 
@@ -42,7 +46,7 @@ this global one — see [precedence](https://opencode.ai/docs/config/)).
 | `opencode.json` | Main config: default models, permissions, agents, commands, MCP servers, formatter |
 | `AGENTS.md` | Team-wide instructions loaded into every session (house rules, testing policy) |
 | `prompt/*.md` | System prompts for the custom agents defined in `opencode.json` |
-| `scripts/install.sh` / `install.ps1` | One-shot bootstrap for a new machine |
+| `scripts/install.sh` / `install.ps1` | One-shot bootstrap for a new machine (also syncs GeniusOrchestrator skills) |
 
 ### Agents
 
